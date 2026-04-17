@@ -76,6 +76,17 @@ def consultar_login(nome_login, senha_login):
     # se o nome existe no banco de dados retorna None
     # se a senha nao coincide retorna False
     # Se os dados  forem exato, retorna True
+    
+def consultar_cargo(nome_login): 
+    conexao = sqlite3.connect("banco.db")
+    cursor = conexao.cursor()
+    cursor.execute("""SELECT cargo FROM funcionarios WHERE nome = ?""",(nome_login,))
+    dados = cursor.fetchone()
+    if dados[0] == 'vendedor':
+        return False
+    elif dados[0] == 'gerente' or dados[0] == 'dono':
+        return True
+    # consultar e validar cargo atual
         
 
         

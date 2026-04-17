@@ -29,21 +29,25 @@ def validar_login():
     elif retorno_consulta == False:
         label_pagina_login.configure(text="Senha invalida")
     elif retorno_consulta == True:
-        sleep(1)
-        pagina_login.pack_forget()
-        pagina_sistema.pack()
+        permissao_menu_gerencial = db.consultar_cargo(nome_login)
+        if permissao_menu_gerencial == True:
+            pagina_login.pack_forget()
+            pagina_sistema_gerencial.pack()
+        elif permissao_menu_gerencial == False:
+            pagina_login.pack_forget()
+            pagina_sistema_vendedor.pack()
+            
         
         
-        
-def copiar_nome(nome):
-    label_nome.configure(text=nome)
     
 
-
+# criaçao janelas
 janela = ctk.CTk()
 janela.title("Pagina de login")
-janela.geometry("400x300")
+janela.geometry("500x450")
+# ------------------------------
 
+# ----------------------- JANELA LOGIN -----------------------------------
 pagina_login = ctk.CTkFrame(janela)
 pagina_login.pack()
 
@@ -58,9 +62,54 @@ botao_confirmar_login.pack()
 label_pagina_login = ctk.CTkLabel(pagina_login, text="")
 label_pagina_login.pack(pady=10)
 
-# ----------------------- JANELA SISTEMA ---------------------------------
-pagina_sistema = ctk.CTkFrame(janela)
-ctk.CTkLabel(pagina_sistema, text="Bem vindo ao sistema").pack()
+# ------------------- JANELA SISTEMA GERENCIAL --------------------------
+pagina_sistema_gerencial = ctk.CTkFrame(janela)
+ctk.CTkLabel(pagina_sistema_gerencial, text="Bem vindo ao sistema gerencial").pack()
+
+
+ctk.CTkLabel(pagina_sistema_gerencial, text="Cadastrar Funcionario").pack()
+btn_cadastrar_funcionario = ctk.CTkButton(pagina_sistema_gerencial, text="acessar")
+btn_cadastrar_funcionario.pack()
+
+ctk.CTkLabel(pagina_sistema_gerencial, text="Remover funcionario").pack()
+btn_cadastrar_funcionario = ctk.CTkButton(pagina_sistema_gerencial, text="acessar")
+btn_cadastrar_funcionario.pack()
+
+ctk.CTkLabel(pagina_sistema_gerencial, text="Adicionar veiculo").pack()
+btn_cadastrar_funcionario = ctk.CTkButton(pagina_sistema_gerencial, text="acessar")
+btn_cadastrar_funcionario.pack()
+
+ctk.CTkLabel(pagina_sistema_gerencial, text="Remover veiculo").pack()
+btn_cadastrar_funcionario = ctk.CTkButton(pagina_sistema_gerencial, text="acessar")
+btn_cadastrar_funcionario.pack()
+
+ctk.CTkLabel(pagina_sistema_gerencial, text="Todos Veiculos").pack()
+btn_cadastrar_funcionario = ctk.CTkButton(pagina_sistema_gerencial, text="acessar")
+btn_cadastrar_funcionario.pack()
+
+ctk.CTkLabel(pagina_sistema_gerencial, text="Ganhos e lucros").pack()
+btn_cadastrar_funcionario = ctk.CTkButton(pagina_sistema_gerencial, text="acessar")
+btn_cadastrar_funcionario.pack()
+
+ctk.CTkLabel(pagina_sistema_gerencial, text="Todos funcionarios").pack()
+btn_cadastrar_funcionario = ctk.CTkButton(pagina_sistema_gerencial, text="acessar")
+btn_cadastrar_funcionario.pack()
+
+ctk.CTkLabel(pagina_sistema_gerencial, text="Sair").pack()
+btn_cadastrar_funcionario = ctk.CTkButton(pagina_sistema_gerencial, text="acessar")
+btn_cadastrar_funcionario.pack()
+
+
+# ------------------------------------------------------------------------
+
+# ---------------------- JANELA SISTEMA VENDAS ---------------------------
+pagina_sistema_vendedor = ctk.CTkFrame(janela)
+ctk.CTkLabel(pagina_sistema_vendedor, text="Bem vindo ao sistema de vendas").pack()
+
+
+
+
+
 
 
 # scroll = ctk.CTkScrollableFrame(pagina_sistema, width=200, height=150) # frame scrollavel
@@ -75,9 +124,6 @@ ctk.CTkLabel(pagina_sistema, text="Bem vindo ao sistema").pack()
 Lambda faz a pausa do loop pra poder criar um botao independente pra cada nome,
 pra q cada botao possa enviar o nome (nesse caso) para a funçao poder tratar o dado.
 """
-    
-label_nome = ctk.CTkLabel(pagina_sistema, text="")
-label_nome.pack()
 
 
 janela.mainloop()
