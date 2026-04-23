@@ -1,4 +1,8 @@
 import sqlite3
+import datetime
+
+
+
 def inicializar_banco():
     conexao = sqlite3.connect("banco.db")
     cursor = conexao.cursor()
@@ -87,7 +91,133 @@ def consultar_cargo(nome_login):
     elif dados[0] == 'gerente' or dados[0] == 'dono':
         return True
     # consultar e validar cargo atual
-        
+    
+    
+def get_conexao():
+    return sqlite3.connect("banco.db")
+
+def salvar_veiculo(nome, cor, ano, valor_fipe, valor_compra, comissao):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("""INSERT INTO veiculos (nome, cor, ano, valor_fipe, valor_compra_ou_cliente, comissao_sugerida, status)
+                VALUES (?,?,?,?,?,?,?)""", (nome, cor, ano, valor_fipe, valor_compra, comissao, 'disponivel'))
+    con.commit()
+    con.close()
+
+def deletar_veiculo(id_veiculo):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("DELETE FROM veiculos WHERE id = ?", (id_veiculo,))
+    con.commit()
+    con.close()
+
+def deletar_funcionario(id_func):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("DELETE FROM funcionarios WHERE id = ?", (id_func,))
+    con.commit()
+    con.close()
+
+def buscar_veiculo_por_id(id_veiculo):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("SELECT id, nome, cor, ano, valor_fipe, valor_compra_ou_cliente, comissao_sugerida, status FROM veiculos WHERE id = ?", (id_veiculo,))
+    resultado = cur.fetchone()
+    con.close()
+    return resultado
+
+def listar_veiculos(apenas_disponiveis=False):
+    con = get_conexao()
+    cur = con.cursor()
+    if apenas_disponiveis:
+        cur.execute("SELECT id, nome, cor, ano, valor_fipe, valor_compra_ou_cliente, comissao_sugerida, status FROM veiculos WHERE status = 'disponivel'")
+    else:
+        cur.execute("SELECT id, nome, cor, ano, valor_fipe, valor_compra_ou_cliente, comissao_sugerida, status FROM veiculos")
+    resultado = cur.fetchall()
+    con.close()
+    return resultado
+
+def listar_funcionarios():
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("SELECT id, nome, cargo FROM funcionarios")
+    resultado = cur.fetchall()
+    con.close()
+    return resultado
+
+def buscar_funcionario_por_id(id_func):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("SELECT id, nome, cargo FROM funcionarios WHERE id = ?", (id_func,))
+    resultado = cur.fetchone()
+    con.close()
+    return resultado
+
+def buscar_id_funcionario(nome):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("SELECT id FROM funcionarios WHERE nome = ?", (nome,))
+    resultado = cur.fetchone()
+    con.close()
+    return resultado[0]
+
+def get_cargo_texto(nome):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("SELECT cargo FROM funcionarios WHERE nome = ?", (nome,))
+    resultado = cur.fetchone()
+    con.close()
+    return resultado[0]
+
+def verificar_senha_atual(nome):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("SELECT senha FROM funcionarios WHERE nome = ?", (nome,))
+    resultado = cur.fetchone()
+    con.close()
+    return resultado[0]
+
+def alterar_senha_db(nome, nova_senha):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("UPDATE funcionarios SET senha = ? WHERE nome = ?", (nova_senha, nome))
+    con.commit()
+    con.close()
+
+def realizar_venda_db(id_veiculo, nome_vendedor, valor_final):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("SELECT valor_compra_ou_cliente FROM veiculos WHERE id = ?", (id_veiculo,))
+    valor_compra = cur.fetchone()[0]
+    id_vendedor = buscar_id_funcionario(nome_vendedor)
+    data_atual = datetime.datetime.now().strftime("%d/%m/%Y")
+    cur.execute("UPDATE veiculos SET status = 'indisponivel' WHERE id = ?", (id_veiculo,))
+    cur.execute("""INSERT INTO vendas (id_veiculo, id_vendedor, valor_de_compra_ou_cliente, valor_final_venda, data_venda)
+                VALUES (?,?,?,?,?)""", (id_veiculo, id_vendedor, valor_compra, valor_final, data_atual))
+    con.commit()
+    con.close()
+
+def ganhos_todos():
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("""SELECT funcionarios.nome, SUM(vendas.valor_final_venda), COUNT(vendas.id)
+                   FROM vendas INNER JOIN funcionarios ON vendas.id_vendedor = funcionarios.id
+                   GROUP BY vendas.id_vendedor""")
+    resultado = cur.fetchall()
+    con.close()
+    return resultado
+
+def ganhos_vendedor(nome):
+    con = get_conexao()
+    cur = con.cursor()
+    cur.execute("""SELECT funcionarios.nome, SUM(vendas.valor_final_venda), COUNT(vendas.id)
+                   FROM vendas INNER JOIN funcionarios ON vendas.id_vendedor = funcionarios.id
+                   WHERE funcionarios.nome = ?
+                   GROUP BY vendas.id_vendedor""", (nome,))
+    resultado = cur.fetchone()
+    con.close()
+    return resultado
+
 
         
     
